@@ -22,7 +22,7 @@ The `requirements.txt` includes:
 - `numpy`
 - `tqdm`
 - `matplotlib`
-- `plt`
+- `seaborn`
 
 ---
 
