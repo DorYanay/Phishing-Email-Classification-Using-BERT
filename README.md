@@ -42,10 +42,8 @@ The project uses datasets containing labeled email samples from the following so
 ## Model Training
 ### Steps
 1. **Load Pre-trained BERT**: Use a BERT base model (`bert-base-uncased`) from the `transformers` library.
-2. **Fine-Tuning**: Train the model on the phishing classification dataset.
-3. **Evaluation**: Test the model on a separate validation set.
+2. **Fine-Tuning**: Train the model on the phishing classification dataset using the following training arguments:
 
-**Training Arguments for the fine-tuning**:
    ```python
    training_args = TrainingArguments(
        output_dir='./results',
@@ -66,6 +64,42 @@ The project uses datasets containing labeled email samples from the following so
    )
    ```
 
+3. **Evaluation**: Test the model on a separate validation set.
+
+---
+
+## Adversarial Training
+### Overview
+To enhance the robustness of the BERT model, adversarial training is implemented by generating modified phishing email examples with subtle alterations to phishing keywords (e.g., replacing 'a' with '@', 'o' with '0'). This strategy tests the model's ability to detect phishing emails that attempt to evade detection.
+
+### Process
+1. Identify common phishing-related keywords (e.g., "bank", "account", "login").
+2. Generate adversarial examples by slightly modifying the keywords within the email text.
+3. Evaluate the model on these adversarial examples to measure its robustness.
+
+### Code Snippet
+The following function generates adversarial examples and evaluates the model:
+
+```python
+# Implement Adversarial Training for Robustness
+def adversarial_training(dataset, model, tokenizer, num_adversarial_examples=1000):
+    phishing_keywords = ["bank", "account", "password", "login", "verify", "security", "urgent", "immediate", "credit", "transaction"]
+
+    adversarial_texts = []
+    for i in range(num_adversarial_examples):
+        original_text = dataset.texts[i]
+        modified_text = original_text
+        for keyword in phishing_keywords:
+            if keyword in modified_text:
+                modified_text = modified_text.replace(keyword, keyword.replace('a', '@').replace('o', '0').replace('e', 'ë').replace('i', 'ï'))
+        adversarial_texts.append(modified_text)
+
+    adversarial_labels = dataset.labels[:num_adversarial_examples]
+    adversarial_dataset = EmailDataset(adversarial_texts, adversarial_labels)
+
+    print("\nEvaluating on Adversarial Examples:")
+    evaluate_model(trainer, adversarial_dataset)
+```
 ---
 
 ## Evaluation Metrics
