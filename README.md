@@ -45,6 +45,27 @@ The project uses datasets containing labeled email samples from the following so
 2. **Fine-Tuning**: Train the model on the phishing classification dataset.
 3. **Evaluation**: Test the model on a separate validation set.
 
+**Training Arguments for the fine-tuning**:
+   ```python
+   training_args = TrainingArguments(
+       output_dir='./results',
+       evaluation_strategy='steps',
+       learning_rate=3e-5,
+       per_device_train_batch_size=batch_size,
+       per_device_eval_batch_size=batch_size,
+       num_train_epochs=1,
+       weight_decay=0.01,
+       logging_dir='./logs',
+       logging_steps=100,
+       save_steps=100,
+       save_strategy='steps',
+       load_best_model_at_end=True,
+       metric_for_best_model='eval_loss',
+       fp16=use_fp16,  # Dynamically determined mixed precision
+       report_to='none'
+   )
+   ```
+
 ---
 
 ## Evaluation Metrics
